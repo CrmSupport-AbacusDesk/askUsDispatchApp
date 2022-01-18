@@ -1,5 +1,5 @@
 {
-  "name": "ask_packaging",
+  "name": "ask_dispatch",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -19,10 +19,13 @@
     "react": "17.0.2",
     "react-native": "0.66.4",
     "react-native-ble-plx": "^2.0.3",
+    "react-native-camera": "^4.2.1",
     "react-native-dialog": "^9.2.0",
     "react-native-elements": "^3.4.2",
     "react-native-gesture-handler": "^2.1.0",
     "react-native-paper": "^4.11.1",
+    "react-native-permissions": "^3.2.0",
+    "react-native-qrcode-scanner": "^1.5.4",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.10.1",
     "react-native-vector-icons": "^9.0.0",
