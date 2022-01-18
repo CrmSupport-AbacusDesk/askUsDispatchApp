@@ -16,10 +16,9 @@ const Dashboard = ({ navigation }) => {
     });
 
     const getMasterBox = async () => {
-        BaseService.post('CouponCode/InvoiceListing'
+      await  BaseService.post('CouponCode/InvoiceListing'
         ).then(res => {
             console.log('Invoice Listing', res);
-
             if (res.status == 200) {
                 setMasterBoxInfo(res.data.invoice_list)
                 console.log('success');
@@ -32,84 +31,74 @@ const Dashboard = ({ navigation }) => {
 
     const RenderMasterBox = ({ item }) => {
         return (
-            <Pressable style={styles.Product} onPress={() => navigation.navigate('InvoiceDetail', { 'invoice_no': item.invoice_no ,'VendorName':item.Cust_Vendor_Name})}>
-                <View>
-                    <Text style={{ fontWeight: 'bold',color:AppTheme.Secondary }}>
-                        {item.invoice_no}
+            <Pressable style={styles.Product} onPress={() => navigation.navigate('InvoiceDetail', { 'invoice_no': item.invoice_no, 'VendorName': item.Cust_Vendor_Name })}>
+                <View style={{ flexDirection: 'row', }}>
+                    <View style={{ flex:1,flexDirection:'row'}}>
+                    <Text style={{ fontSize: 13, color: AppTheme.Medium, fontWeight: 'bold' }}>
+                        Date :
                     </Text>
+                    <Text style={{ fontSize: 12, color: AppTheme.Secondary, fontWeight: '500', paddingLeft: 4 }}>
+                        {moment(item.Bill_Date).format('DD-MMM-YYYY')}
+                    </Text>
+                    </View>
+                    <View style={{flex:1,marginLeft:60}}>
+                    <Text style={{ fontWeight: 'bold', color: AppTheme.Secondary }}>
+                        {item.invoice_no ? item.invoice_no : 'N/A'}
+                    </Text>
+                    </View>
                 </View>
-                <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#9ec0ff', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: AppTheme.LightBlue, alignItems: 'center', justifyContent: 'space-between' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Avatar.Text size={20} label={item.Cust_Vendor_Name ?(String(item.Cust_Vendor_Name.charAt(0)).toUpperCase()):'N/A'} color={AppTheme.Light} labelStyle={{ fontWeight: 'bold', fontSize: 12, lineHeight: 16 }} style={{ marginRight: 8 }} />
-                        <Title style={{ fontSize: 12, color: AppTheme.Medium }}>
-                            {item.Cust_Vendor_Name}
+                        <Avatar.Text size={20} label={item.Cust_Vendor_Name ? (String(item.Cust_Vendor_Name.charAt(0)).toUpperCase()) : 'N/A'} color={AppTheme.Light} labelStyle={{ fontWeight: 'bold', fontSize: 12, lineHeight: 16 }} style={{ marginRight: 8 }} />
+                        <Title style={{ fontSize: 12, color:'#666666' }}>
+                            {item.Cust_Vendor_Name ? item.Cust_Vendor_Name : 'N/A'}
                         </Title>
                     </View>
-                    {/* <View style={styles.ProdCount}>
-                        <Text style={{ fontSize: 10,color:AppTheme.Secondary,fontWeight:'bold' }}>
-                            {item.invoice_no}
-                        </Text>
-                    </View> */}
                     <Icon
                         name='arrow-forward-ios'
-                        color='#9ec0ff'
+                        color={AppTheme.LightBlue}
                         style={{ marginLeft: 16 }} />
 
                 </View>
-                {/* Bill_Date: "20220112"
-Cust_Vendor_Name: "KBM AUTO AGENCIES"
-: "2131102562"
-total_item */}
-                <View style={{ flexDirection: 'row', marginTop: 10, justifyContent: 'space-between', marginVertical: 6 }}>
-                    <View style={{flex:1, alignItems: 'center', flexDirection: 'row',borderRightWidth:2,borderColor:'#9ec0ff' }}>
-                        <Text style={{ fontSize: 13, color: AppTheme.Medium, fontWeight: 'bold' }}>
-                            Date :
-                        </Text>
-                        <View>
-                            <Text style={{ fontSize: 12, color: AppTheme.Secondary, fontWeight: 'bold',paddingLeft:4 }}>
-                    {moment(item.Bill_Date).format('DD-MMM-YYYY')}
-                            </Text>
-                        </View>
-                    </View>
-                    <View style={{flex:1, alignItems: 'center', flexDirection: 'row' ,paddingLeft:6}}>
-                        <Text style={{ fontSize: 13, color: AppTheme.Medium, fontWeight: 'bold' }}>
+                <View style={{ flexDirection: 'row',paddingVertical:10, justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: AppTheme.LightBlue}}>
+                    <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', borderRightWidth: 2, borderColor: AppTheme.LightBlue }}>
+                        <Text style={{ fontSize: 12, color: AppTheme.Medium, fontWeight: 'bold' }}>
                             Total Item :
                         </Text>
-                        
-                            <Text style={{ fontSize: 12, color: AppTheme.Secondary, fontWeight: 'bold',paddingLeft:4 }}>
-                                {item.total_item}
+                        <View>
+                            <Text style={{ fontSize: 12, color: AppTheme.Secondary, fontWeight: '500', paddingLeft: 4 }}>
+                            {item.total_item ? item.total_item : "N/A"}
                             </Text>
                         </View>
                     </View>
+                    <View style={{  alignItems: 'center', flexDirection: 'row', paddingHorizontal: 6 }}>
+                        <Text style={{ fontSize: 12, color: AppTheme.Medium, fontWeight: 'bold' }}>
+                            Total Amount :
+                        </Text>
 
-                
-                {/*<View style={{ flexDirection: 'row', marginTop: 10 }}>
-                    <Text style={{ fontSize: 12, color: AppTheme.Medium,fontWeight:'bold' }}>
-                        Total Part :
-                    </Text>
-                    <View style={styles.ProdCount}>
-                        <Text style={{ fontSize: 10,color:AppTheme.Secondary,fontWeight:'bold' }}>
-                            {item.total_size}
+                        <Text style={{ fontSize: 12, color: AppTheme.Secondary, fontWeight: '500', paddingLeft: 4 }}>
+                          ₹ {item.total_sum ? (Number(item.total_sum).toFixed(2).replace(/(\d)(?=(\d{2})+\d\.)/g, '$1,')) : 0}
+
                         </Text>
                     </View>
-                </View> */}
+                </View>
+
+
+                <View style={{ flexDirection: 'row', marginTop: 10 ,alignItems:'center'}}>
+                    <Text style={{ fontSize: 13, color: AppTheme.Medium,fontWeight:'bold' }}>
+                        Dispatch status :
+                    </Text>
+                    <View style={styles.ProdCount}>
+                        <Text style={{ fontSize: 13,color:AppTheme.Secondary,fontWeight:'500' }}>
+                            {item.dispatched_status ? item.dispatched_status :'N/A'}
+                        </Text>
+                    </View>
+                </View> 
             </Pressable>
         )
     }
     return (
         <View style={styles.Dashboard}>
-
-            {/* <View style={{ backgroundColor: 'red', height: 30, justifyContent: 'center' }}>
-                <Text style={{ color: 'white' }}>
-                    ASK US
-                </Text>
-            </View> */}
-            {/* 
-            <View style={{ alignItems: 'flex-end', marginHorizontal: 16, marginTop: 16 }}>
-                <Icon name='qr-code-scanner' size={35} onPress={() =>
-                    navigation.navigate('CouponScan')
-                } />
-            </View> */}
             <View style={styles.Master}>
                 <View style={styles.MasterHead}>
                     <Text style={{ paddingLeft: 10, fontSize: 16, fontWeight: '500', color: 'white' }}>
@@ -162,14 +151,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     Product: {
-        backgroundColor: 'white',
+        // backgroundColor: 'white',
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 3, },
         shadowOpacity: 0.40,
         shadowRadius: 6.27,
         elevation: 9,
         marginVertical: 6,
-        borderColor: '#9ec0ff',
+        borderColor: AppTheme.LightBlue,
         backgroundColor: '#e6eefc',
         padding: 5,
         borderWidth: 1,

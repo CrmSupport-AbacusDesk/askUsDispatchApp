@@ -1,4 +1,4 @@
-package com.askpackaging;
+package com.askdispatch;
 
 import com.facebook.react.ReactActivity;
 
