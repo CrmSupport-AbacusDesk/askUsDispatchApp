@@ -14,7 +14,8 @@ const AppTheme = {
     LinkClr: '#0044FF',
     skyClr: '#5490F9',
     statusBar: "#dce4e6",
-    LightBlue:'#0077d9'
+    LightBlue:'#0077d9',
+    TabClr:'#1f4cad',
 };
 
 export default AppTheme;
