@@ -2,9 +2,10 @@ import * as React from 'react';
 // import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Dashboard from '../screens/Dashboard';
-import CouponScan from '../screens/CouponScan';
+// import CouponScan from '../screens/WareHouse';
+import Warehouse from '../screens/WareHouse';
 import InvoiceDetail from '../screens/InvoiceDetail';
-import BoxDetail from '../screens/BoxDetail';
+// import BoxDetail from '../screens/BoxDetail';
 import AppTheme from '../Componenets/AppTheme.js/AppTheme';
 const MyStack = () => {
   const Stack = createNativeStackNavigator()
@@ -24,15 +25,15 @@ const MyStack = () => {
             // headerTitleStyle: { fontSize: 16 }
         }
       }} />
-        {/* <Stack.Screen name="CouponScan" component={CouponScan} options={{ 
-            title: 'Coupon Scan', 
+        <Stack.Screen name="Warehouse" component={Warehouse} options={{ 
+            title: 'Ware House', 
             headerTintColor:'white',
            headerStyle: {
             backgroundColor:AppTheme.Danger,
             borderBottomWidth: 0,
             //  fontSize: 16 
         }
-      }}/> */}
+      }}/>
         <Stack.Screen name="InvoiceDetail" component={InvoiceDetail} options={{ 
             title: 'Invoice Detail', 
             headerTintColor:'white',
