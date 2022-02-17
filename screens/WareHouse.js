@@ -17,19 +17,20 @@ const Warehouse = ({ navigation }) => {
 
     const [showSnackBar, setShowSnackBar] = useState(false);
     const [reactive, setreactive] = useState(false);
-    const [CouponData, setCouponData] = useState({});
+    // const [CouponData, setCouponData] = useState({});
     const [showAlert, setshowAlert] = useState(false);
     const [Box, setBox] = React.useState([]);
+    const [boxTableList, setBoxTableList] = React.useState([]);
     const [wareHouseInfo, setwareHouseInfo] = React.useState([]);
     const [scanned, setScanned] = React.useState(true);
     const [warehouseType, setWarehouseType] = React.useState('');
-    const [PartCode, setPartCode] = React.useState('');
-    const [MasterBoxInfo, setMasterBoxInfo] = React.useState([])
-    const [MasterBox, setMasterBox] = React.useState([])
+    // const [PartCode, setPartCode] = React.useState('');
+    // const [MasterBoxInfo, setMasterBoxInfo] = React.useState([])
+    // const [MasterBox, setMasterBox] = React.useState([])
     const [scannedPrimaryCoupon, setScannedPrimaryCoupon] = React.useState(false)
     const [message, setMessage] = React.useState({ type: '', title: '', message: '' });
     const [buttonDisabled, setButtonDiabled] = React.useState(false);
-    const [Count, setCount] = React.useState(1);
+    // const [Count, setCount] = React.useState(1);
     let scanner;
 
     React.useEffect(() => {
@@ -49,19 +50,19 @@ const Warehouse = ({ navigation }) => {
 
         // await BaseService.post('CouponCode/wareHouseList',
         const response = await fetch('https://phpstack-414838-2222412.cloudwaysapps.com/askApi/index.php/CouponCode/wareHouseList');
-           
-        const res = await response.json();
-    
-        // ).then(res => {
-            console.log('Master Coupon data line 64', res);
 
-            if (res.msg == "Success") {
-                setwareHouseInfo(res.data);
-                setreactive(true)
-            }
-            else if (res.data.status == "300") {
-                setMessage({ type: 'error', title: "Error!", message: res.data.message });
-            }
+        const res = await response.json();
+
+        // ).then(res => {
+        console.log('Master Coupon data line 64', res);
+
+        if (res.msg == "Success") {
+            setwareHouseInfo(res.data);
+            setreactive(true)
+        }
+        else if (res.data.status == "300") {
+            setMessage({ type: 'error', title: "Error!", message: res.data.message });
+        }
         // }).catch(err => console.log('line 94 ->', err))
 
     }
@@ -71,9 +72,8 @@ const Warehouse = ({ navigation }) => {
 
         setScanned(false);
         // console.log('lin 75', CouponData.box_size);
-        console.log('box line 79', Box.length);
-        console.log('primary coupon 80', codeValue.data);
-        console.log('condition checked', Number(CouponData.box_size) >= Number(Box.length));
+        // console.log('box line 79', Box.length);
+        // console.log('primary coupon 80', codeValue.data);
         const response = await fetch('https://phpstack-414838-2222412.cloudwaysapps.com/askApi/index.php/CouponCode/master_box_status', {
             method: 'POST',
             headers: {
@@ -82,69 +82,77 @@ const Warehouse = ({ navigation }) => {
             },
             body: JSON.stringify({
                 'master_box_coupon': codeValue.data,
-                 'master_box_codes': MasterBox 
             })
         });
         const res = await response.json();
-    
-        // await BaseService.post('CouponCode/master_box_status', { 'master_box_coupon': codeValue.data, 'master_box_codes': MasterBox }
+
+        // await BaseService.post('CouponCode/master_box_status', { 'master_box_coupon': codeValue.data, }
         // ).then(res => {
 
-            console.log('Master Box', res);
-            if (res.data.status == "200") {
+        console.log('Master Box line 92', res);
+        if (res.data.status == "200") {
 
-                // const index = Box.findIndex(row => row.serial_no == codeValue.data);
-                let boxData = []
-                boxData = Box;
-                const index = boxData.findIndex(row => row == codeValue.data);
-                console.log('index 76', index);
-                if (index === -1) {
-                    // let boxData = Box;j
-                    // for (let index = 0; index < boxData.length; index++) {
-                    //     const x = Box.findIndex(row => row.part_code == codeValue.data);
-                    //     if(x === -1){
-
-                    //     }
-                        
-                    // }
-                    setBox(Box => [...Box, codeValue.data]);
-                    setShowSnackBar(true);
-                    setTimeout(() => {
-                        setShowSnackBar(false);
-                        setScanned(true)
-                    }, 700);
-                    setreactive(true)
-                    // setMessage({ type: 'Success', title: "Success!", message: 'Master Box Added To List' });
-                    // setshowAlert(true);
-                    setMasterBox(res.data.master_box_codes)
-                    setMasterBoxInfo(res.data.master_box_information)
-                    setPartCode(res.data.master_box_information.part_code) 
+            // const index = Box.findIndex(row => row.serial_no == codeValue.data);
+            let boxData = []
+            boxData = Box;
+            const index = boxData.findIndex(row => row.coupon_code == codeValue.data);
+            // console.log('index 100', index);
+            if (index === -1) {
+                boxData.push(res.data.master_box_information);
+                setBox(boxData);
+                let boxData2 = [];
+                // setBox(Box => [...Box, codeValue.data]);
+                for (let i = 0; i < boxData.length; i++) {
+                    let j = boxData2.findIndex(row => row.part_code == boxData[i].part_code);
+                    if (j === -1) {
+                        boxData2.push({ 'part_code': boxData[i].part_code, 'count': 1 })
+                    }
+                    else {
+                        boxData2[j].count = boxData2[j].count + 1;
+                    }
                 }
-                else {
-                    setMessage({ type: 'error', title: "Warning!", message: 'Master Box Already Exist In List' });
-                    setshowAlert(true)
-                    setreactive(false)
-                }
-            }
-            else if (res.data.status == "300") {
-                setMessage({ type: 'error', title: "Error!", message: res.data.message });
-                setshowAlert(true)
-                setreactive(false)
+                console.log('line 123 table count', boxData2);
+                setBoxTableList(boxData2);
+                setShowSnackBar(true);
+                setTimeout(() => {
+                    setShowSnackBar(false);
+                    setScanned(true)
+                }, 700);
+                setreactive(true)
+                // setMessage({ type: 'Success', title: "Success!", message: 'Master Box Added To List' });
+                // setshowAlert(true);
+                // setMasterBox(res.data.master_box_codes)
+                // setMasterBoxInfo(res.data.master_box_information)
             }
             else {
-                setMessage({ type: 'error', title: "Error!", message: res.data.message });
+                setMessage({ type: 'error', title: "Warning!", message: 'Master Box Already Exist In List' });
                 setshowAlert(true)
                 setreactive(false)
             }
+        }
+        else if (res.data.status == "300") {
+            setMessage({ type: 'error', title: "Error!", message: res.data.message });
+            setshowAlert(true)
+            setreactive(false)
+        }
+        else {
+            setMessage({ type: 'error', title: "Error!", message: res.data.message });
+            setshowAlert(true)
+            setreactive(false)
+        }
         // }).catch(err => console.log('line 94 ->', err))
 
 
     }
-console.log('Box Value',Box);
 
     const SaveToWarehouse = async () => {
 
         setButtonDiabled(true);
+        let data = [];
+        for (let index = 0; index < Box.length; index++) {
+            data.push(Box[index].coupon_code)
+        }
+        console.log('155 coupon code',data);
         const response = await fetch('https://phpstack-414838-2222412.cloudwaysapps.com/askApi/index.php/CouponCode/assign_box_to_warehouse', {
             method: 'POST',
             headers: {
@@ -153,28 +161,28 @@ console.log('Box Value',Box);
             },
             body: JSON.stringify({
                 'warehouse_id': warehouseType,
-                 'box_array': Box
+                'box_array': data
             })
         });
         const res = await response.json();
         // await BaseService.post('CouponCode/assign_box_to_warehouse', { 'warehouse_id': warehouseType, 'box_array': Box }
         // ).then(res => {
-            console.log('Saved Box coupon data ', res);
-            // console.log('Saved Box coupon data ', res.data);
-            setButtonDiabled(false);
-            navigation.navigate('Dashboard');
-            // if (res.data.data.status == "200") {
-            //     console.log(e);
-            //     setBox(Box => [...Box, e]);
+        console.log('Saved Box coupon data line 163', res);
+        // console.log('Saved Box coupon data ', res.data);
+        navigation.navigate('Dashboard');
+        setButtonDiabled(false);
+        // if (res.data.data.status == "200") {
+        //     console.log(e);
+        //     setBox(Box => [...Box, e]);
 
-            //     // setBox([{...Box,e}])
-            //     // seteditable(false)
-            //     // setColor('green')
-            // }
-            // else {
-            //     setMessage({ type: 'error', title: "Error!", message: res.data.data.message });
-            //     setshowAlert(true)
-            // }
+        //     // setBox([{...Box,e}])
+        //     // seteditable(false)
+        //     // setColor('green')
+        // }
+        // else {
+        //     setMessage({ type: 'error', title: "Error!", message: res.data.data.message });
+        //     setshowAlert(true)
+        // }
         // }).catch(err => console.log('line 94 ->', err))
     }
 
@@ -194,7 +202,7 @@ console.log('Box Value',Box);
                 wareHouseInfo.map((s, index) => {
                     s.id &&
                         wareHouseArray.push(
-                            <Picker.Item style={{ fontSize: 11 }} label={s.warehouse_name} value={s.id} key={index} style={{ backgroundColor: 'red' }} />
+                            <Picker.Item style={{ fontSize: 11, backgroundColor: 'red' }} label={s.warehouse_name} value={s.id} key={index} />
                         )
 
                 })
@@ -202,39 +210,61 @@ console.log('Box Value',Box);
         return wareHouseArray;
     };
 
-    console.log('warehouse ID', warehouseType);
 
     const removeCoupon = (item, index) => {
-        setBox(Box => Box.filter((Box, i) => i !== index));
+        let boxData = [];
+        boxData = Box;
+        boxData.splice(index, 1);
+        setBox(boxData);
+        // setBox(Box => Box.filter((Box, i) => i !== index));
+        let boxData2 = [];
+        // setBox(Box => [...Box, codeValue.data]);
+        for (let i = 0; i < boxData.length; i++) {
+            let j = boxData2.findIndex(row => row.part_code == boxData[i].part_code);
+            if (j === -1) {
+                boxData2.push({ 'part_code': boxData[i].part_code, 'count': 1 })
+            }
+            else {
+                boxData2[j].count = boxData2[j].count + 1;
+            }
+        }
+        console.log('line 226 table count', boxData2);
+        setBoxTableList(boxData2);
     }
 
     // console.log('MasterBoxInfo',MasterBoxInfo);
     const RenderBoxList = ({ item, index }) => {
+
         return (
             <View style={[styles.Detail, { marginHorizontal: 10 }]}>
                 <View style={{ flexDirection: 'row', backgroundColor: "#d9e7ff", alignItems: 'center', borderBottomWidth: 2 }}>
                     <Text style={{ fontSize: 12, fontWeight: '500', padding: 8 }}>Sr. Master Box {index + 1}:</Text>
-                    <Text style={{ fontSize: 12, fontWeight: '500', marginLeft: 8, color: AppTheme.Secondary, flex: 1 }}>{item ? item : 'N/A'}</Text>
+                    <Text style={{ fontSize: 12, fontWeight: '500', marginLeft: 8, color: AppTheme.Secondary, flex: 1 }}>{item.coupon_code ? item.coupon_code : 'N/A'}</Text>
                     <IconButton icon="delete-sweep" color={AppTheme.Danger} size={20} style={{ marginLeft: 14 }} onPress={() => removeCoupon(item, index)} />
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', padding: 8 }}>
-                    <Text style={{ fontSize: 11, fontWeight: '500', color: AppTheme.Secondary, flex: 1 }}>{MasterBoxInfo.part_code ? MasterBoxInfo.part_code : 'N/A'}</Text>
+                    <Text style={{ fontSize: 11, fontWeight: '500', color: AppTheme.Secondary, flex: 1 }}>{item.part_code ? item.part_code : 'N/A'}</Text>
                     <Text style={{ fontSize: 12, fontWeight: '500', paddingLeft: 12 }}>Box Size : </Text>
-                    <Text style={{ fontSize: 11, fontWeight: '500', color: AppTheme.Secondary }}>{MasterBoxInfo.box_size ? MasterBoxInfo.box_size : 'N/A'}</Text>
+                    <Text style={{ fontSize: 11, fontWeight: '500', color: AppTheme.Secondary }}>{item.box_size ? item.box_size : 'N/A'}</Text>
                 </View>
             </View>
         )
+
     }
+
+
     const RenderPartCodeList = ({ item, index }) => {
         return (
             <>
                 <View style={{ flexDirection: 'row', borderTopWidth: 2, borderColor: AppTheme.LightBlue }}>
-                    <Text style={{ fontSize: 10, fontWeight: 'bold', width: '70%', marginLeft: 10, borderRightWidth: 2, padding: 2, borderColor: AppTheme.LightBlue }}>{MasterBoxInfo.part_code ? MasterBoxInfo.part_code : 'N/A'}</Text>
-                    <Title style={{ fontSize: 10, marginLeft: 8 }}>{Count}</Title>
+                    <Text style={{ fontSize: 10, fontWeight: 'bold', width: '70%', marginLeft: 10, borderRightWidth: 2, padding: 2, borderColor: AppTheme.LightBlue }}>{item.part_code ? item.part_code : 'N/A'}</Text>
+                    <Title style={{ fontSize: 10, marginLeft: 8 }}>{item.count ? item.count : 'N/A'}</Title>
                 </View>
             </>
         )
     }
+
+
 
     return (
 
@@ -255,7 +285,7 @@ console.log('Box Value',Box);
             </View>
 
             {/* Table------------------------------------------------------------------------------------------ */}
-            {Box.length >= 1 ?
+            {boxTableList.length > 0 ?
                 <View style={[styles.Detail]}>
                     <View style={{ flexDirection: 'row', backgroundColor: AppTheme.LightBlue, }}>
                         <Title style={{ fontSize: 12, width: '70%', marginLeft: 10, borderRightWidth: 2, marginVertical: -0.1, borderColor: AppTheme.LightBlue, color: AppTheme.Light }}>Part Code</Title>
@@ -263,11 +293,11 @@ console.log('Box Value',Box);
                     </View>
                     <FlatList nestedScrollEnabled={true} showsHorizontalScrollIndicator={false}
                         keyExtractor={(item, index) => index}
-                        data={Box}
+                        data={boxTableList}
                         renderItem={RenderPartCodeList}
                     />
                 </View>
-                 : null} 
+                : null}
             {/* Scanning Button-------------------------------------------------------------------------------- */}
             {warehouseType != "" ?
                 <View style={{ marginHorizontal: 16, marginVertical: 16 }}>
@@ -327,12 +357,12 @@ console.log('Box Value',Box);
                                 bottomContent={
                                     !showAlert &&
                                     <>
-                                     <SnackbarComponent visible={showSnackBar}
-                                     message={'Box Added To list'} />
-                                    <TouchableOpacity style={styles.buttonTouchable} onPress={() => setScannedPrimaryCoupon(false)}>
-                                        <Text style={styles.buttonText}>View All</Text>
-                                    </TouchableOpacity>
-                                     </>
+                                        <SnackbarComponent visible={showSnackBar}
+                                            message={'Box Added To list'} />
+                                        <TouchableOpacity style={styles.buttonTouchable} onPress={() => setScannedPrimaryCoupon(false)}>
+                                            <Text style={styles.buttonText}>View All</Text>
+                                        </TouchableOpacity>
+                                    </>
                                 }
                                 style={{ flex: 1 }}
                             >
