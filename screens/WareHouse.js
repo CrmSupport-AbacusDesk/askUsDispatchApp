@@ -10,10 +10,13 @@ import AppButton from '../Componenets/AppButton/AppButton'
 import GlobelStyle from '../Componenets/GlobalStyle/GlobalStyle';
 import AppTheme from '../Componenets/AppTheme.js/AppTheme';
 import { Picker } from '@react-native-picker/picker';
+import SnackbarComponent from '../Componenets/Snackbar/SnackbarComponent';
 const opacity = 'rgba(0, 0, 0, .6)';
 
 const Warehouse = ({ navigation }) => {
 
+    const [showSnackBar, setShowSnackBar] = useState(false);
+    const [reactive, setreactive] = useState(false);
     const [CouponData, setCouponData] = useState({});
     const [showAlert, setshowAlert] = useState(false);
     const [Box, setBox] = React.useState([]);
@@ -23,7 +26,6 @@ const Warehouse = ({ navigation }) => {
     const [PartCode, setPartCode] = React.useState('');
     const [MasterBoxInfo, setMasterBoxInfo] = React.useState([])
     const [MasterBox, setMasterBox] = React.useState([])
-    const [masterCouponScanned, setMasterCouponScanned] = React.useState(true);
     const [scannedPrimaryCoupon, setScannedPrimaryCoupon] = React.useState(false)
     const [message, setMessage] = React.useState({ type: '', title: '', message: '' });
     const [buttonDisabled, setButtonDiabled] = React.useState(false);
@@ -40,18 +42,8 @@ const Warehouse = ({ navigation }) => {
 
 
     const startScan = () => {
-        if (scannedPrimaryCoupon) {
-            if (scanner) {
-                console.log('in if line 31');
-                scanner._setScanning(false);
-            }
-            else {
-                console.log('in else line 35');
-                scanner._setScanning(true);
-            }
-        }
+        scanner._setScanning(false)
     };
-
 
     const getwareHouse = async () => {
 
@@ -65,6 +57,7 @@ const Warehouse = ({ navigation }) => {
 
             if (res.msg == "Success") {
                 setwareHouseInfo(res.data);
+                setreactive(true)
             }
             else if (res.data.status == "300") {
                 setMessage({ type: 'error', title: "Error!", message: res.data.message });
@@ -74,7 +67,7 @@ const Warehouse = ({ navigation }) => {
     }
 
 
-    const checkPrimaryCoupon = async (codeValue) => {
+    const checkMasterCoupon = async (codeValue) => {
 
         setScanned(false);
         // console.log('lin 75', CouponData.box_size);
@@ -100,10 +93,13 @@ const Warehouse = ({ navigation }) => {
             console.log('Master Box', res);
             if (res.data.status == "200") {
 
-                const index = Box.findIndex(row => row.serial_no == codeValue.data);
+                // const index = Box.findIndex(row => row.serial_no == codeValue.data);
+                let boxData = []
+                boxData = Box;
+                const index = boxData.findIndex(row => row == codeValue.data);
                 console.log('index 76', index);
                 if (index === -1) {
-                    // let boxData = Box;
+                    // let boxData = Box;j
                     // for (let index = 0; index < boxData.length; index++) {
                     //     const x = Box.findIndex(row => row.part_code == codeValue.data);
                     //     if(x === -1){
@@ -112,24 +108,33 @@ const Warehouse = ({ navigation }) => {
                         
                     // }
                     setBox(Box => [...Box, codeValue.data]);
-                    setMessage({ type: 'Success', title: "Success!", message: 'Master Box Added To List' });
-                    setshowAlert(true);
+                    setShowSnackBar(true);
+                    setTimeout(() => {
+                        setShowSnackBar(false);
+                        setScanned(true)
+                    }, 700);
+                    setreactive(true)
+                    // setMessage({ type: 'Success', title: "Success!", message: 'Master Box Added To List' });
+                    // setshowAlert(true);
                     setMasterBox(res.data.master_box_codes)
                     setMasterBoxInfo(res.data.master_box_information)
-                    setPartCode(res.data.master_box_information.part_code)
+                    setPartCode(res.data.master_box_information.part_code) 
                 }
                 else {
                     setMessage({ type: 'error', title: "Warning!", message: 'Master Box Already Exist In List' });
                     setshowAlert(true)
+                    setreactive(false)
                 }
             }
             else if (res.data.status == "300") {
                 setMessage({ type: 'error', title: "Error!", message: res.data.message });
                 setshowAlert(true)
+                setreactive(false)
             }
             else {
                 setMessage({ type: 'error', title: "Error!", message: res.data.message });
                 setshowAlert(true)
+                setreactive(false)
             }
         // }).catch(err => console.log('line 94 ->', err))
 
@@ -176,6 +181,7 @@ console.log('Box Value',Box);
 
     const handleOk = () => {
         setScanned(true);
+        setreactive(true);
         setshowAlert(false);
         startScan()
     }
@@ -315,14 +321,18 @@ console.log('Box Value',Box);
 
                             <QRCodeScanner
                                 ref={(camera) => scanner = camera}
-                                onRead={scanned ? checkPrimaryCoupon : undefined}
+                                onRead={scanned ? checkMasterCoupon : undefined}
                                 flashMode={RNCamera.Constants.FlashMode.off}
-                                reactivate={scanned ? true : false}
+                                reactivate={reactive}
                                 bottomContent={
                                     !showAlert &&
+                                    <>
+                                     <SnackbarComponent visible={showSnackBar}
+                                     message={'Box Added To list'} />
                                     <TouchableOpacity style={styles.buttonTouchable} onPress={() => setScannedPrimaryCoupon(false)}>
                                         <Text style={styles.buttonText}>View All</Text>
                                     </TouchableOpacity>
+                                     </>
                                 }
                                 style={{ flex: 1 }}
                             >
